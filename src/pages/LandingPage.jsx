@@ -2,18 +2,18 @@ import { Link } from 'react-router-dom';
 import MiniSimulator from '../components/MiniSimulator';
 
 const FEATURES = [
-  { icon: '📊', title: 'Carbon Analytics', desc: 'Detailed, audit-ready calculations tracking your transportation, home energy, water consumption, and goods spending.' },
-  { icon: '🤖', title: 'AI Sustainability Coach', desc: 'Interact with a conversational agent to analyze your lifestyle habits and generate weekly, low-effort carbon mitigation tasks.' },
-  { icon: '🔮', title: 'Lifestyle Simulator', desc: 'Model potential shifts—like installing solar, EV commutes, or dietary changes—to immediately preview budget savings and CO₂ reductions.' },
-  { icon: '🏆', title: 'Gamified Missions', desc: 'Unlock XP points, complete daily eco-challenges, track active habits, and earn collectible achievement badges.' },
-  { icon: '🌐', title: 'Global Network', desc: 'Connect with a community of thousands, contribute to collective milestones, and climb the local leaderboard.' },
-  { icon: '📄', title: 'PDF Export Diagnostics', desc: 'Compile your calculations, target goals, and active recommendations into clean, downloadable PDF diagnostics reports.' },
+  { icon: '📊', title: 'Emissions Analysis', desc: 'Robust calculations tracking greenhouse gas output from transportation, home energy, food preferences, and material purchases.' },
+  { icon: '🤖', title: 'AI Sustainability Coach', desc: 'Interact with an intelligent assistant to walk through your daily habits and establish a tailored Weekly Action Plan.' },
+  { icon: '🔮', title: 'Impact Simulator', desc: 'Model potential shifts—like installing solar, EV commutes, or dietary changes—to immediately preview CO₂ reductions and cost savings.' },
+  { icon: '🏆', title: 'Eco Challenges', desc: 'Take part in structured daily, weekly, and monthly challenges to build carbon-conscious lifestyle habits.' },
+  { icon: '🌐', title: 'Community Insights', desc: 'Review global mitigation statistics, participate in community milestones, and inspect community action rankings.' },
+  { icon: '📄', title: 'Diagnostics Report', desc: 'Compile your calculations, target goals, and active recommendations into clean, downloadable PDF report files.' },
 ];
 
-const TESTIMONIALS = [
-  { quote: "EcoTrack AI turned complex carbon math into small, clear habits. In three months, I saved $80/month and reduced my footprint by 25%.", user: "Sarah Jenkins", role: "Software Engineer" },
-  { quote: "The AI Coach weekly action plans are incredibly practical. It suggests simple checklist items that fit naturally into my routine.", user: "David Chen", role: "Product Designer" },
-  { quote: "The simulator is eye-opening. Seeing my gas savings and tree offset equivalent immediately updated helped me commit to getting an EV.", user: "Elena Rostova", role: "Sustainability Officer" },
+const INSIGHTS = [
+  { title: "⚡ Grid Electrification", text: "Transitioning standard home electricity to green tariff options or residential solar is the single most effective way to eliminate home emissions." },
+  { title: "🥦 Plant-Forward Diets", text: "Beef and dairy production contribute to over 14% of global greenhouse gases. Switching even a few meals to plant-based choices offers significant carbon relief." },
+  { title: "🚴 Active Transportation", text: "A single passenger vehicle emits roughly 4.6 metric tons of CO₂ per year. Transitioning short commutes to rail, bus, or cycling cuts this output to zero." },
 ];
 
 export default function LandingPage() {
@@ -27,24 +27,24 @@ export default function LandingPage() {
           gridTemplateColumns: '1.2fr 1fr',
           gap: '48px',
           alignItems: 'center',
-        }}>
+         }}>
           {/* Hero Content */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <div className="saas-badge saas-badge--green" style={{ alignSelf: 'flex-start' }}>
-              🚀 Product Launch // Platform Live
+              🌱 Research & Educational Initiative
             </div>
             <h1 style={{ fontSize: 'clamp(32px, 5vw, 56px)', lineHeight: 1.1 }}>
               Measure, Model, and Mitigate Your Carbon Footprint
             </h1>
             <p style={{ fontSize: '18px', color: 'var(--text-secondary)' }}>
-              A premium personal carbon intelligence platform. Sync your lifestyle metrics, simulate habits savings, and coordinate green adjustments with a conversational AI coach.
+              An open-source diagnostic platform assisting citizens in calculating their emissions, simulating lifestyle changes, and participating in sustainability challenges.
             </p>
             <div style={{ display: 'flex', gap: '16px', marginTop: '8px' }}>
               <Link to="/coach" className="saas-btn saas-btn--primary">
-                Get Started Free
+                Start Assessment
               </Link>
               <Link to="/dashboard" className="saas-btn">
-                Open Console
+                View My Impact
               </Link>
             </div>
           </div>
@@ -66,19 +66,19 @@ export default function LandingPage() {
         }}>
           <div>
             <div style={{ fontSize: '36px', fontWeight: 800, color: 'var(--color-primary)' }}>2.8M kg</div>
-            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>CO₂ Reduced</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>CO₂ Mitigated</div>
           </div>
           <div>
             <div style={{ fontSize: '36px', fontWeight: 800, color: 'var(--color-primary)' }}>142k+</div>
-            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Trees Planted</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Trees Planted Equivalent</div>
           </div>
           <div>
             <div style={{ fontSize: '36px', fontWeight: 800, color: 'var(--text-primary)' }}>28,475</div>
-            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Active Members</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Synced Citizens</div>
           </div>
           <div>
             <div style={{ fontSize: '36px', fontWeight: 800, color: 'var(--text-primary)' }}>87</div>
-            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Regions Connected</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Regions Engaged</div>
           </div>
         </div>
       </section>
@@ -86,9 +86,9 @@ export default function LandingPage() {
       {/* Feature Showcase Grid */}
       <section className="container">
         <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-          <h2 style={{ fontSize: '32px', marginBottom: '16px' }}>Engineered for Active Impact</h2>
+          <h2 style={{ fontSize: '32px', marginBottom: '16px' }}>Educational & Analytical Tools</h2>
           <p style={{ maxWidth: '600px', margin: '0 auto', fontSize: '16px', color: 'var(--text-secondary)' }}>
-            We've stripped away the noise to build a highly optimized diagnostic dashboard that turns carbon metrics into clear daily actions.
+            EcoTrack AI provides robust data models and guided steps to translate daily routines into actionable, low-carbon decisions.
           </p>
         </div>
 
@@ -107,10 +107,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* Sustainability Insights (Replaces Testimonials) */}
       <section className="container">
         <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-          <h2 style={{ fontSize: '32px', marginBottom: '16px' }}>Approved by Climate Leaders</h2>
+          <h2 style={{ fontSize: '32px', marginBottom: '16px' }}>Carbon Awareness & Science</h2>
         </div>
 
         <div style={{
@@ -118,15 +118,12 @@ export default function LandingPage() {
           gridTemplateColumns: 'repeat(3, 1fr)',
           gap: '24px',
         }}>
-          {TESTIMONIALS.map((test, idx) => (
-            <div key={idx} className="saas-card" style={{ display: 'flex', flexDirection: 'column', justifyBetween: 'space-between', minHeight: '180px' }}>
-              <p style={{ fontSize: '14px', fontStyle: 'italic', color: 'var(--text-primary)', marginBottom: '24px' }}>
-                "{test.quote}"
+          {INSIGHTS.map((info, idx) => (
+            <div key={idx} className="saas-card" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--color-primary)' }}>{info.title}</h3>
+              <p style={{ fontSize: '13px', color: 'var(--text-primary)', lineHeight: '1.6' }}>
+                {info.text}
               </p>
-              <div style={{ marginTop: 'auto' }}>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-primary)' }}>{test.user}</div>
-                <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px' }}>{test.role}</div>
-              </div>
             </div>
           ))}
         </div>
@@ -140,16 +137,16 @@ export default function LandingPage() {
           background: 'radial-gradient(ellipse at top, rgba(16,185,129,0.1), transparent)',
           borderColor: 'rgba(16, 185, 129, 0.2)',
         }}>
-          <h2 style={{ fontSize: '36px', marginBottom: '16px' }}>Calibrate Your Biosphere Path Today</h2>
+          <h2 style={{ fontSize: '36px', marginBottom: '16px' }}>Initiate Your Carbon Diagnostic</h2>
           <p style={{ maxWidth: '500px', margin: '0 auto 28px auto', fontSize: '16px', color: 'var(--text-secondary)' }}>
-            Join over 28,000 members tracking their footprints, finishing challenges, and scaling green actions.
+            Calculate your baseline carbon score, simulate habit modifications, and unlock a tailored weekly action plan.
           </p>
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
             <Link to="/coach" className="saas-btn saas-btn--primary">
-              Initialize AI Coach
+              Calculate My Footprint
             </Link>
             <Link to="/dashboard" className="saas-btn">
-              View Your Console
+              View My Impact
             </Link>
           </div>
         </div>

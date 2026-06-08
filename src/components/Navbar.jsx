@@ -58,7 +58,7 @@ export default function Navbar() {
         {/* CTA Button */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <NavLink to="/coach" className="saas-btn saas-btn--primary saas-btn--sm">
-            Try Free
+            Start Assessment
           </NavLink>
         </div>
       </div>

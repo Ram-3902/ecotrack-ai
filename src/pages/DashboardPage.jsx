@@ -53,18 +53,18 @@ export default function DashboardPage({ carbonData }) {
     doc.setFont('Helvetica', 'normal');
     doc.setFontSize(22);
     doc.setTextColor(16, 185, 129); // emerald
-    doc.text('EcoTrack AI — Footprint Diagnostics', 20, 24);
+    doc.text('EcoTrack AI — Footprint Assessment', 20, 24);
     
     doc.setFontSize(10);
     doc.setTextColor(100, 116, 139);
-    doc.text(`Compiled on: ${new Date().toLocaleDateString()} · Year 2045 Diagnostic Core`, 20, 32);
+    doc.text(`Compiled on: ${new Date().toLocaleDateString()} · Year 2045 Assessment Core`, 20, 32);
 
     doc.setDrawColor(229, 231, 235);
     doc.line(20, 36, 190, 36);
 
     doc.setFontSize(14);
     doc.setTextColor(15, 23, 42);
-    doc.text('Biometric Calibration Summary', 20, 48);
+    doc.text('Carbon Footprint Summary', 20, 48);
 
     doc.setFontSize(11);
     doc.text(` Planetary Health Score: ${score}/100`, 24, 58);
@@ -89,7 +89,7 @@ export default function DashboardPage({ carbonData }) {
     doc.setTextColor(100, 116, 139);
     doc.text('Thank you for logging your carbon data. Implement recommendations to heal our biosphere.', 20, yOffset + 16);
 
-    doc.save('ecotrack_diagnostics.pdf');
+    doc.save('ecotrack_assessment.pdf');
   };
 
   const score = carbonData?.score || 60;
@@ -123,11 +123,11 @@ export default function DashboardPage({ carbonData }) {
       {/* Top Banner Details */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h2 style={{ fontSize: '28px', fontWeight: 800 }}>Carbon Diagnostics Console</h2>
+          <h2 style={{ fontSize: '28px', fontWeight: 800 }}>Carbon Footprint Console</h2>
           <p style={{ color: 'var(--text-secondary)', marginTop: '4px' }}>Real-time telemetry and resource usage breakdown.</p>
         </div>
         <button className="saas-btn saas-btn--primary saas-btn--sm" onClick={downloadPDFReport}>
-          📥 Export Diagnostics PDF
+          📥 Export Assessment PDF
         </button>
       </div>
 

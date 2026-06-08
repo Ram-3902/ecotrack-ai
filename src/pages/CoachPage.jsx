@@ -166,7 +166,9 @@ export default function CoachPage({ carbonData, onUpdateCarbonData }) {
     setMessages(prev => [...prev, {
       id: Date.now().toString(),
       role: 'ai',
-      text: `🔬 **Diagnostics calibrated successfully!**\n\nYour carbon score of **${coachResults.score}/100** has been synced. The dashboard graphs and simulator settings have updated matching your diagnostic data.`
+      text: `🔬 **Footprint assessment completed successfully!**
+
+Your carbon score of **${coachResults.score}/100** has been synced. The dashboard graphs and simulator settings have updated matching your assessment data.`
     }]);
   };
 
@@ -190,7 +192,7 @@ export default function CoachPage({ carbonData, onUpdateCarbonData }) {
           </button>
 
           <button className="saas-btn saas-btn--secondary" style={{ width: '100%' }} onClick={startCoachAssessment}>
-            🌿 Start AI Diagnostic
+            🌿 Start Assessment
           </button>
 
           <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -232,7 +234,7 @@ export default function CoachPage({ carbonData, onUpdateCarbonData }) {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '18px' }}>🤖</span>
-              <span style={{ fontWeight: 600, fontSize: '15px' }}>{isCoaching ? 'AI Sustainability Diagnostic' : 'AI Guide'}</span>
+              <span style={{ fontWeight: 600, fontSize: '15px' }}>{isCoaching ? 'AI Sustainability Assessment' : 'AI Guide'}</span>
             </div>
             {isCoaching && (
               <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-primary)', fontFamily: 'var(--font-mono)' }}>
@@ -323,7 +325,7 @@ export default function CoachPage({ carbonData, onUpdateCarbonData }) {
 
                 {coachStep === 2 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '520px', margin: '0 auto', width: '100%' }}>
-                    <h3>🥦 Food & Waste Diagnostics</h3>
+                    <h3>🥦 Food & Waste Assessment</h3>
                     <p>Select your diet type and specify the average grocery discard rate.</p>
 
                     <div>
@@ -464,7 +466,7 @@ export default function CoachPage({ carbonData, onUpdateCarbonData }) {
 
                 {coachStep === 5 && !coachResults && (
                   <div style={{ display: 'flex', flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
-                    <div className="pulse" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-primary)' }}>Analyzing footprint diagnostics...</div>
+                    <div className="pulse" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-primary)' }}>Analyzing footprint data...</div>
                   </div>
                 )}
 
@@ -472,7 +474,7 @@ export default function CoachPage({ carbonData, onUpdateCarbonData }) {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', overflowY: 'auto', maxHeight: '490px', paddingRight: '4px', maxWidth: '600px', margin: '0 auto', width: '100%' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--color-border)', paddingBottom: '12px' }}>
                       <div>
-                        <h3>Diagnostic Calibration Complete</h3>
+                        <h3>Assessment Complete</h3>
                         <p style={{ fontSize: '12px' }}>Calculated carbon rating: <strong>{coachResults.yearlyTons} tons</strong> CO₂/yr</p>
                       </div>
                       <div style={{
@@ -528,8 +530,8 @@ export default function CoachPage({ carbonData, onUpdateCarbonData }) {
                     </div>
 
                     <div style={{ display: 'flex', gap: '12px', marginTop: '12px', borderTop: '1px solid var(--color-border)', paddingTop: '16px' }}>
-                      <button className="saas-btn" onClick={() => setCoachStep(1)}>Retake Diagnostics</button>
-                      <button className="saas-btn saas-btn--primary" style={{ marginLeft: 'auto' }} onClick={applyCoachCalibration}>Calibrate Biosphere</button>
+                      <button className="saas-btn" onClick={() => setCoachStep(1)}>Retake Assessment</button>
+                      <button className="saas-btn saas-btn--primary" style={{ marginLeft: 'auto' }} onClick={applyCoachCalibration}>Generate My Action Plan</button>
                     </div>
 
                   </div>
