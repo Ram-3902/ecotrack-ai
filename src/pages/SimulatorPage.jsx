@@ -1,5 +1,33 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
+import { CarbonDataShape } from '../utils/propTypes';
 
+
+
+/**
+ * Daily food emission factors by diet type (kg CO₂/day).
+ * Shared constant eliminating duplication between vegan and zeroWaste simulation branches.
+ * @type {Object<string, number>}
+ */
+const DIET_EMISSION_FACTORS = {
+  heavy_meat: 7.2,
+  mixed: 4.5,
+  pescatarian: 3.0,
+  vegetarian: 2.5,
+  vegan: 1.5,
+};
+
+/**
+ * Set of valid toggle keys for whitelist validation in handleToggle.
+ * Prevents toggling arbitrary or injected state keys.
+ * @type {Set<string>}
+ */
+const VALID_TOGGLE_KEYS = new Set(['solar', 'vegan', 'ev', 'zeroWaste', 'thrift', 'shortShowers']);
+
+/** Number of weeks in a year for annual projections. @type {number} */
+const WEEKS_PER_YEAR = 52;
+
+/** Number of days in a year for annual projections. @type {number} */
+const DAYS_PER_YEAR = 365;
 export default function SimulatorPage({ carbonData }) {
   const [simChoices, setSimChoices] = useState({
     solar: false,
@@ -10,14 +38,8 @@ export default function SimulatorPage({ carbonData }) {
     shortShowers: false,
   });
 
-  const [simResults, setSimResults] = useState({
-    co2: 0,
-    money: 0,
-    trees: 0,
-  });
-
-  useEffect(() => {
-    if (!carbonData) return;
+  const simResults = useMemo(() => {
+    if (!carbonData) return { co2: 0, money: 0, trees: 0 };
 
     const currentForm = carbonData.formData || {};
     const transport = currentForm.transportation || {};
@@ -42,10 +64,9 @@ export default function SimulatorPage({ carbonData }) {
     // 2. Vegan
     if (simChoices.vegan) {
       const currentDietType = food.dietType || 'mixed';
-      const dietFactors = { heavy_meat: 7.2, mixed: 4.5, pescatarian: 3.0, vegetarian: 2.5, vegan: 1.5 };
-      const currentFactor = dietFactors[currentDietType] || 4.5;
-      const diffDaily = Math.max(0, currentFactor - 1.5);
-      co2Reduction += diffDaily * 365;
+      const currentFactor = DIET_EMISSION_FACTORS[currentDietType] || DIET_EMISSION_FACTORS.mixed;
+      const diffDaily = Math.max(0, currentFactor - DIET_EMISSION_FACTORS.vegan);
+      co2Reduction += diffDaily * DAYS_PER_YEAR;
       moneySavings += 650;
     }
 
@@ -56,15 +77,14 @@ export default function SimulatorPage({ carbonData }) {
       const carFactors = { gasoline: 0.21, diesel: 0.17, hybrid: 0.11, electric: 0.05, none: 0 };
       const currentFactor = carFactors[carType] || 0.21;
       const diffPerKm = Math.max(0, currentFactor - 0.05);
-      co2Reduction += diffPerKm * carKm * 52;
-      moneySavings += carKm * 52 * 0.15; // fuel
+      co2Reduction += diffPerKm * carKm * WEEKS_PER_YEAR;
+      moneySavings += carKm * WEEKS_PER_YEAR * 0.15; // fuel
     }
 
     // 4. Zero waste
     if (simChoices.zeroWaste) {
       const dietType = food.dietType || 'mixed';
-      const dietFactors = { heavy_meat: 7.2, mixed: 4.5, pescatarian: 3.0, vegetarian: 2.5, vegan: 1.5 };
-      const baseDaily = dietFactors[dietType] || 4.5;
+      const baseDaily = DIET_EMISSION_FACTORS[dietType] || DIET_EMISSION_FACTORS.mixed;
       const currentWaste = food.foodWastePercent || 15;
       const wasteMonthly = baseDaily * 30 * (currentWaste / 100);
       co2Reduction += wasteMonthly * 12;
@@ -82,18 +102,23 @@ export default function SimulatorPage({ carbonData }) {
     if (simChoices.shortShowers) {
       const currentShowerMins = water.showerMinutesPerDay || 8;
       const reductionMins = Math.max(0, currentShowerMins - 5);
-      co2Reduction += reductionMins * 365 * 0.042;
-      moneySavings += reductionMins * 365 * 0.05;
+      co2Reduction += reductionMins * DAYS_PER_YEAR * 0.042;
+      moneySavings += reductionMins * DAYS_PER_YEAR * 0.05;
     }
 
-    setSimResults({
+    return {
       co2: Math.round(co2Reduction),
       money: Math.round(moneySavings),
       trees: Math.round(co2Reduction / 22),
-    });
+    };
   }, [simChoices, carbonData]);
 
+  /**
+   * Toggles a simulation choice on/off. Only accepts known toggle keys.
+   * @param {string} key - The simulation option key to toggle.
+   */
   const handleToggle = (key) => {
+    if (!VALID_TOGGLE_KEYS.has(key)) return;
     setSimChoices(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
@@ -225,3 +250,8 @@ export default function SimulatorPage({ carbonData }) {
     </div>
   );
 }
+
+SimulatorPage.propTypes = {
+  carbonData: CarbonDataShape,
+};
+

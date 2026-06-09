@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 export default function ScoreGauge({ score = 60, size = 120 }) {
   const radius = size * 0.4;
   const strokeWidth = size * 0.08;
@@ -86,3 +88,9 @@ export default function ScoreGauge({ score = 60, size = 120 }) {
     </div>
   );
 }
+
+ScoreGauge.propTypes = {
+  score: PropTypes.number,
+  size: PropTypes.number,
+};
+

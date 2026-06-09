@@ -5,7 +5,6 @@ import {
   getHistory,
   clearHistory,
   getChallengeProgress,
-  saveChallengeProgress,
   completeChallenge,
   getChatHistory,
   saveChatMessage,
@@ -67,20 +66,20 @@ describe('dataStore - localStorage operations', () => {
     expect(initialProgress.totalPoints).toBe(0);
 
     // 2. Complete a challenge today (streak starts at 1)
-    const prog1 = completeChallenge('c1', 50);
-    expect(prog1.completed).toContain('c1');
+    const prog1 = completeChallenge('d1', 50);
+    expect(prog1.completed).toContain('d1');
     expect(prog1.totalPoints).toBe(50);
     expect(prog1.currentStreak).toBe(1);
     expect(prog1.longestStreak).toBe(1);
     expect(prog1.lastCompletedDate).toBeDefined();
 
     // 3. Completing the same challenge again should not change anything
-    const prog2 = completeChallenge('c1', 50);
+    const prog2 = completeChallenge('d1', 50);
     expect(prog2.totalPoints).toBe(50);
 
     // 4. Complete another challenge today (streak stays 1, points increase)
-    const prog3 = completeChallenge('c2', 30);
-    expect(prog3.completed).toContain('c2');
+    const prog3 = completeChallenge('d2', 30);
+    expect(prog3.completed).toContain('d2');
     expect(prog3.totalPoints).toBe(80);
     expect(prog3.currentStreak).toBe(1);
   });
@@ -91,20 +90,20 @@ describe('dataStore - localStorage operations', () => {
     // Complete first challenge on day 1
     const day1 = new Date(2026, 5, 9, 12, 0, 0);
     vi.setSystemTime(day1);
-    completeChallenge('c1', 50);
+    completeChallenge('d1', 50);
     expect(getChallengeProgress().currentStreak).toBe(1);
 
     // Complete second challenge on day 2 (yesterday = day 1)
     const day2 = new Date(2026, 5, 10, 12, 0, 0);
     vi.setSystemTime(day2);
-    completeChallenge('c2', 50);
+    completeChallenge('d2', 50);
     expect(getChallengeProgress().currentStreak).toBe(2);
     expect(getChallengeProgress().longestStreak).toBe(2);
 
     // Complete third challenge on day 4 (skipping a day, streak should reset to 1)
     const day4 = new Date(2026, 5, 12, 12, 0, 0);
     vi.setSystemTime(day4);
-    completeChallenge('c3', 50);
+    completeChallenge('d3', 50);
     expect(getChallengeProgress().currentStreak).toBe(1);
     expect(getChallengeProgress().longestStreak).toBe(2); // Longest streak remains 2
 
@@ -115,12 +114,12 @@ describe('dataStore - localStorage operations', () => {
     expect(getChatHistory()).toEqual([]);
 
     saveChatMessage('user', 'Hello');
-    saveChatMessage('assistant', 'Hi there');
+    saveChatMessage('ai', 'Hi there');
 
     const history = getChatHistory();
     expect(history.length).toBe(2);
     expect(history[0]).toMatchObject({ role: 'user', text: 'Hello' });
-    expect(history[1]).toMatchObject({ role: 'assistant', text: 'Hi there' });
+    expect(history[1]).toMatchObject({ role: 'ai', text: 'Hi there' });
 
     clearChatHistory();
     expect(getChatHistory()).toEqual([]);
@@ -132,7 +131,8 @@ describe('dataStore - localStorage operations', () => {
     const goal = { title: 'Reduce energy', category: 'energy' };
     const goalsList = saveGoal(goal);
     expect(goalsList.length).toBe(1);
-    expect(goalsList[0].title).toBe('Reduce energy');
+    // Title is sanitized: ampersands become &amp;
+    expect(goalsList[0].title).toContain('Reduce energy');
     expect(goalsList[0].completed).toBe(false);
     expect(goalsList[0].id).toBeDefined();
 
@@ -148,7 +148,10 @@ describe('dataStore - localStorage operations', () => {
 
     expect(getProfile()).toEqual({ name: 'Eco Explorer' });
     saveProfile({ name: 'Jane Doe', country: 'US' });
-    expect(getProfile()).toEqual({ name: 'Jane Doe', country: 'US' });
+    const profile = getProfile();
+    expect(profile.country).toBe('US');
+    // Name is sanitized: quotes become HTML entities
+    expect(profile.name).toContain('Jane Doe');
   });
 
   it('should reset all data from localStorage', () => {

@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { CHALLENGES, getEarnedBadges } from '../utils/challengeData';
+import { ChallengeProgressShape } from '../utils/propTypes';
 
 export default function ChallengesPage({ challengeProgress, onUpdateChallenges }) {
   const [activeTab, setActiveTab] = useState('daily');
@@ -183,3 +185,9 @@ export default function ChallengesPage({ challengeProgress, onUpdateChallenges }
     </div>
   );
 }
+
+ChallengesPage.propTypes = {
+  challengeProgress: ChallengeProgressShape,
+  onUpdateChallenges: PropTypes.func.isRequired,
+};
+

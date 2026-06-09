@@ -3,7 +3,6 @@ import {
   getEarnedBadges,
   calculatePoints,
   getCompletedCategories,
-  CHALLENGES,
   BADGES,
 } from '../../src/utils/challengeData';
 

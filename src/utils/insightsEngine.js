@@ -2,6 +2,49 @@
 // INSIGHTS ENGINE — AI-Powered Recommendations
 // ═══════════════════════════════════════════
 
+/**
+ * Relevance boost multiplier for the highest-emission category.
+ * @type {number}
+ */
+const TOP_CATEGORY_BOOST = 3;
+
+/**
+ * Relevance boost multiplier for the second-highest-emission category.
+ * @type {number}
+ */
+const SECOND_CATEGORY_BOOST = 2.5;
+
+/**
+ * Relevance boost multiplier for the third-highest-emission category.
+ * @type {number}
+ */
+const THIRD_CATEGORY_BOOST = 2;
+
+/**
+ * Relevance boost multiplier for lower-ranked emission categories.
+ * @type {number}
+ */
+const LOWER_CATEGORY_BOOST = 1.5;
+
+/**
+ * Normalization divisor for impact score calculation.
+ * @type {number}
+ */
+const IMPACT_NORMALIZER = 100;
+
+/**
+ * Normalization divisor for ease score calculation.
+ * @type {number}
+ */
+const EASE_NORMALIZER = 10;
+
+/**
+ * Comprehensive database of carbon reduction recommendations.
+ * Each entry includes impact estimates, ease-of-implementation scores,
+ * cost savings projections, and categorical tags for filtering.
+ *
+ * @type {Array<{id: string, category: string, title: string, description: string, impactKg: number, easeScore: number, costSavings: number, icon: string, tags: string[]}>}
+ */
 const RECOMMENDATIONS_DB = [
   // ── Transportation ──
   {
@@ -347,38 +390,60 @@ const RECOMMENDATIONS_DB = [
 ];
 
 /**
- * Generate personalized recommendations based on user's carbon profile
+ * Maps internal category names to recommendation database categories.
+ * Used for associating emission breakdown categories with recommendation entries.
+ * @type {Object<string, string>}
+ */
+const CATEGORY_MAP = {
+  transportation: 'transportation',
+  energy: 'energy',
+  food: 'food',
+  shopping: 'shopping',
+  water: 'water',
+};
+
+/**
+ * Generates personalized carbon reduction recommendations based on a user's emission breakdown.
+ * Recommendations are scored using a composite of environmental impact, ease of implementation,
+ * and relevance to the user's highest-emission categories.
+ *
+ * @param {Object} breakdown - Per-category monthly emission breakdown in kg CO₂.
+ * @param {number} [breakdown.transportation] - Monthly transportation emissions.
+ * @param {number} [breakdown.energy] - Monthly energy emissions.
+ * @param {number} [breakdown.food] - Monthly food emissions.
+ * @param {number} [breakdown.shopping] - Monthly shopping emissions.
+ * @param {number} [breakdown.water] - Monthly water emissions.
+ * @returns {Array<Object>} Sorted array of recommendation objects, each enriched with
+ *   `relevanceScore` and `compositeScore` fields. Highest composite score first.
+ *
+ * @example
+ * generateInsights({ transportation: 200, energy: 100, food: 150, shopping: 50, water: 10 })
+ * // Returns recommendations prioritized for transportation (highest emissions)
  */
 export function generateInsights(breakdown) {
-  if (!breakdown) return [];
+  if (!breakdown || typeof breakdown !== 'object' || Array.isArray(breakdown)) {
+    return [];
+  }
 
-  // Find highest-emission categories
+  // Find highest-emission categories, sorted descending
   const categories = Object.entries(breakdown)
+    .filter(([, value]) => typeof value === 'number' && Number.isFinite(value))
     .sort((a, b) => b[1] - a[1])
     .map(([cat]) => cat);
 
-  // Map category names to recommendation categories
-  const categoryMap = {
-    transportation: 'transportation',
-    energy: 'energy',
-    food: 'food',
-    shopping: 'shopping',
-    water: 'water',
-  };
-
-  // Score each recommendation
+  // Score each recommendation based on impact, ease, and relevance
   const scored = RECOMMENDATIONS_DB.map(rec => {
     let relevanceScore = 1;
 
     // Boost recommendations for high-emission categories
-    const catIndex = categories.indexOf(categoryMap[rec.category] || rec.category);
-    if (catIndex === 0) relevanceScore = 3;
-    else if (catIndex === 1) relevanceScore = 2.5;
-    else if (catIndex === 2) relevanceScore = 2;
-    else if (catIndex <= 3) relevanceScore = 1.5;
+    const catIndex = categories.indexOf(CATEGORY_MAP[rec.category] || rec.category);
+    if (catIndex === 0) relevanceScore = TOP_CATEGORY_BOOST;
+    else if (catIndex === 1) relevanceScore = SECOND_CATEGORY_BOOST;
+    else if (catIndex === 2) relevanceScore = THIRD_CATEGORY_BOOST;
+    else if (catIndex <= 3) relevanceScore = LOWER_CATEGORY_BOOST;
 
     // Combined score: impact × ease × relevance
-    const compositeScore = (rec.impactKg / 100) * (rec.easeScore / 10) * relevanceScore;
+    const compositeScore = (rec.impactKg / IMPACT_NORMALIZER) * (rec.easeScore / EASE_NORMALIZER) * relevanceScore;
 
     return {
       ...rec,
@@ -394,34 +459,69 @@ export function generateInsights(breakdown) {
 }
 
 /**
- * Get top N recommendations
+ * Returns the top N most relevant recommendations for a user's emission profile.
+ *
+ * @param {Object} breakdown - Per-category monthly emission breakdown.
+ * @param {number} [n=5] - Number of top recommendations to return.
+ * @returns {Array<Object>} The top N recommendation objects.
+ *
+ * @example
+ * getTopInsights({ transportation: 200, food: 100 }, 3)
+ * // Returns the 3 highest-scored recommendations
  */
 export function getTopInsights(breakdown, n = 5) {
   return generateInsights(breakdown).slice(0, n);
 }
 
 /**
- * Get recommendations filtered by category
+ * Returns recommendations filtered to a specific emission category.
+ *
+ * @param {Object} breakdown - Per-category monthly emission breakdown.
+ * @param {string} category - The category to filter by (e.g., 'transportation', 'food').
+ * @returns {Array<Object>} Filtered and scored recommendations for the specified category.
+ *
+ * @example
+ * getInsightsByCategory({ transportation: 200, food: 100 }, 'food')
+ * // Returns only food-related recommendations, sorted by composite score
  */
 export function getInsightsByCategory(breakdown, category) {
+  if (typeof category !== 'string') return [];
   return generateInsights(breakdown).filter(r => r.category === category);
 }
 
 /**
- * Calculate total potential savings from selected recommendations
+ * Calculates the total potential CO₂ savings and cost savings from a list of recommendations.
+ * Negative cost savings (investment costs) are excluded from the total.
+ *
+ * @param {Array<Object>} recommendations - Array of recommendation objects to aggregate.
+ * @returns {{co2Kg: number, costSavings: number}} Aggregated savings totals.
+ *
+ * @example
+ * calculatePotentialSavings([{ impactKg: 480, costSavings: 2400 }, { impactKg: 300, costSavings: 1200 }])
+ * // Returns: { co2Kg: 780, costSavings: 3600 }
  */
 export function calculatePotentialSavings(recommendations) {
+  if (!Array.isArray(recommendations)) return { co2Kg: 0, costSavings: 0 };
+
   return recommendations.reduce(
     (acc, rec) => ({
-      co2Kg: acc.co2Kg + rec.impactKg,
-      costSavings: acc.costSavings + Math.max(0, rec.costSavings),
+      co2Kg: acc.co2Kg + (typeof rec.impactKg === 'number' ? rec.impactKg : 0),
+      costSavings: acc.costSavings + Math.max(0, typeof rec.costSavings === 'number' ? rec.costSavings : 0),
     }),
     { co2Kg: 0, costSavings: 0 }
   );
 }
 
 /**
- * Get difficulty label
+ * Returns a difficulty label and corresponding color for a given ease score.
+ *
+ * @param {number} easeScore - Ease-of-implementation score (1-10, higher = easier).
+ * @returns {{label: string, color: string}} Object containing human-readable difficulty label and hex color.
+ *
+ * @example
+ * getDifficultyLabel(9)  // { label: 'Easy', color: '#10b981' }
+ * getDifficultyLabel(5)  // { label: 'Moderate', color: '#fbbf24' }
+ * getDifficultyLabel(2)  // { label: 'Challenging', color: '#f97316' }
  */
 export function getDifficultyLabel(easeScore) {
   if (easeScore >= 8) return { label: 'Easy', color: '#10b981' };

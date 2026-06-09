@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, screen, fireEvent, act, within, waitFor } from '@testing-library/react';
-import React from 'react';
+import { render, screen, fireEvent, act, within } from '@testing-library/react';
 import App from '../../src/App';
 
 describe('App Integration Flow', () => {

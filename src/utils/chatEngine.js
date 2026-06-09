@@ -2,6 +2,13 @@
 // CHAT ENGINE — AI Sustainability Assistant
 // ═══════════════════════════════════════════
 
+import { sanitizeTextInput } from './inputSecurity.js';
+
+/**
+ * Knowledge base containing sustainability topic entries.
+ * Each entry has keyword triggers, a formatted response, and suggested follow-up questions.
+ * @type {Array<{keywords: string[], response: string, followUps: string[]}>}
+ */
 const KNOWLEDGE_BASE = [
   {
     keywords: ['carbon footprint', 'what is carbon', 'co2', 'carbon dioxide', 'greenhouse'],
@@ -314,7 +321,10 @@ Anything else I can help with?`,
   },
 ];
 
-// Default response for unrecognized queries
+/**
+ * Default response returned when no knowledge base entry matches the user query.
+ * @type {{response: string, followUps: string[]}}
+ */
 const DEFAULT_RESPONSE = {
   response: `That's an interesting question! While I may not have a specific answer for that, I can help with many sustainability topics:
 
@@ -331,12 +341,36 @@ Try asking me about any of these topics!`,
 };
 
 /**
- * Find the best matching response for a user query
+ * Finds the best matching response from the knowledge base for a given user query.
+ * The query is first sanitized to prevent XSS, then normalized to lowercase.
+ * Matching is scored by keyword length — longer keyword matches contribute more
+ * to the relevance score, prioritizing specific topic matches over generic ones.
+ *
+ * @param {string} query - The raw user query string (will be sanitized internally).
+ * @returns {{text: string, followUps: string[]}} The matched response object containing
+ *   the response text and an array of suggested follow-up question strings.
+ *
+ * @example
+ * getResponse('How can I reduce my carbon footprint?')
+ * // Returns: { text: '...reduction tips...', followUps: ['...', '...'] }
+ *
+ * @example
+ * getResponse('<script>alert("xss")</script>')
+ * // Returns: default response (script tags are stripped by sanitization)
  */
 export function getResponse(query) {
-  const normalizedQuery = query.toLowerCase().trim();
+  // Sanitize input to prevent XSS before processing
+  const sanitizedQuery = sanitizeTextInput(query);
+  const normalizedQuery = sanitizedQuery.toLowerCase().trim();
 
-  // Score each knowledge entry
+  if (!normalizedQuery) {
+    return {
+      text: DEFAULT_RESPONSE.response,
+      followUps: DEFAULT_RESPONSE.followUps,
+    };
+  }
+
+  // Score each knowledge entry by keyword match relevance
   let bestMatch = null;
   let bestScore = 0;
 
@@ -344,7 +378,7 @@ export function getResponse(query) {
     let score = 0;
     for (const keyword of entry.keywords) {
       if (normalizedQuery.includes(keyword)) {
-        // Longer keyword matches are worth more
+        // Longer keyword matches are worth more (more specific)
         score += keyword.length;
       }
     }
@@ -369,7 +403,16 @@ export function getResponse(query) {
 }
 
 /**
- * Get a greeting message
+ * Generates a time-appropriate greeting message for the chat interface.
+ * Uses the current hour to select between morning, afternoon, and evening greetings.
+ *
+ * @returns {{text: string, followUps: string[]}} The greeting object containing
+ *   a formatted welcome message and suggested starter questions.
+ *
+ * @example
+ * // At 10:00 AM:
+ * getGreeting()
+ * // Returns: { text: 'Good morning! 🌿 ...', followUps: [...] }
  */
 export function getGreeting() {
   const hour = new Date().getHours();

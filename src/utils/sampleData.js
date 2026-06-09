@@ -3,20 +3,72 @@
 // ═══════════════════════════════════════════
 
 /**
- * Generate sample historical data for the dashboard
+ * Number of months of historical data to generate.
+ * @type {number}
+ */
+const HISTORY_MONTHS = 12;
+
+/**
+ * Baseline monthly emission (kg CO₂) for historical data generation.
+ * @type {number}
+ */
+const HISTORY_BASE_EMISSION = 420;
+
+/**
+ * Monthly reduction rate (kg CO₂) simulating a gradual improvement trend.
+ * @type {number}
+ */
+const HISTORY_MONTHLY_REDUCTION = 12;
+
+/**
+ * Maximum random variation (kg CO₂) applied to historical data points.
+ * @type {number}
+ */
+const HISTORY_VARIATION_RANGE = 60;
+
+/**
+ * Minimum allowed monthly emission (kg CO₂) in historical data.
+ * @type {number}
+ */
+const HISTORY_MIN_EMISSION = 150;
+
+/**
+ * Number of weeks of weekly data to generate.
+ * @type {number}
+ */
+const WEEKLY_DATA_POINTS = 8;
+
+/**
+ * Milliseconds in one day, used for date arithmetic.
+ * @type {number}
+ */
+const MS_PER_DAY = 86400000;
+
+/**
+ * Generates 12 months of sample historical emission data for dashboard charts.
+ * Simulates a gradual downward trend with realistic random variation.
+ * Each entry includes a date, monthly total, and per-category breakdown.
+ *
+ * @returns {Array<{date: string, month: string, year: number, monthlyTotal: number, breakdown: Object}>}
+ *   Array of 12 monthly data points, oldest first.
+ *
+ * @example
+ * const history = generateSampleHistory();
+ * // history[0].month => 'Jun' (12 months ago)
+ * // history[11].month => 'May' (current month)
  */
 export function generateSampleHistory() {
   const history = [];
   const now = new Date();
 
-  for (let i = 11; i >= 0; i--) {
+  for (let i = HISTORY_MONTHS - 1; i >= 0; i--) {
     const date = new Date(now);
     date.setMonth(date.getMonth() - i);
 
     // Simulate a gradual reduction trend with some variation
-    const baseEmission = 420 - i * 12; // Gradual improvement
-    const variation = (Math.random() - 0.5) * 60;
-    const monthlyTotal = Math.max(150, Math.round(baseEmission + variation));
+    const baseEmission = HISTORY_BASE_EMISSION - i * HISTORY_MONTHLY_REDUCTION;
+    const variation = (Math.random() - 0.5) * HISTORY_VARIATION_RANGE;
+    const monthlyTotal = Math.max(HISTORY_MIN_EMISSION, Math.round(baseEmission + variation));
 
     // Distribute across categories with some randomness
     const transportRatio = 0.30 + (Math.random() - 0.5) * 0.08;
@@ -44,13 +96,22 @@ export function generateSampleHistory() {
 }
 
 /**
- * Generate sample weekly data
+ * Generates 8 weeks of sample weekly emission data.
+ * Simulates a gradual improvement trend for weekly summary views.
+ *
+ * @returns {Array<{week: string, date: string, total: number}>}
+ *   Array of weekly data points, oldest first.
+ *
+ * @example
+ * const weekly = generateSampleWeekly();
+ * // weekly[0].week => 'W1'
+ * // weekly[7].week => 'W8'
  */
 export function generateSampleWeekly() {
   const weeks = [];
   const now = new Date();
 
-  for (let i = 7; i >= 0; i--) {
+  for (let i = WEEKLY_DATA_POINTS - 1; i >= 0; i--) {
     const date = new Date(now);
     date.setDate(date.getDate() - i * 7);
 
@@ -58,7 +119,7 @@ export function generateSampleWeekly() {
     const variation = (Math.random() - 0.5) * 15;
 
     weeks.push({
-      week: `W${8 - i}`,
+      week: `W${WEEKLY_DATA_POINTS - i}`,
       date: date.toISOString(),
       total: Math.max(50, Math.round(baseWeekly + variation)),
     });
@@ -68,7 +129,23 @@ export function generateSampleWeekly() {
 }
 
 /**
- * Generate sample carbon data (current snapshot)
+ * Generates a complete sample carbon data snapshot for first-time users.
+ * Provides realistic default values for all emission categories,
+ * including form data that can be used to recalculate emissions.
+ *
+ * @returns {Object} Complete carbon data snapshot.
+ * @returns {number} returns.monthlyTotal - Monthly emissions in kg CO₂.
+ * @returns {number} returns.yearlyTotal - Annual emissions in kg CO₂.
+ * @returns {number} returns.yearlyTons - Annual emissions in metric tons CO₂.
+ * @returns {number} returns.score - Planetary health score (0-100).
+ * @returns {Object} returns.breakdown - Per-category emission breakdown.
+ * @returns {Object} returns.formData - Input form values used for calculation.
+ * @returns {string} returns.timestamp - ISO timestamp of data generation.
+ *
+ * @example
+ * const data = generateSampleCarbonData();
+ * // data.monthlyTotal => 671.21
+ * // data.score => 35
  */
 export function generateSampleCarbonData() {
   return {
@@ -117,7 +194,15 @@ export function generateSampleCarbonData() {
 }
 
 /**
- * Generate sample goals
+ * Generates sample reduction goals for first-time users.
+ * Provides a mix of completed and in-progress goals across categories.
+ *
+ * @returns {Array<Object>} Array of sample goal objects.
+ *
+ * @example
+ * const goals = generateSampleGoals();
+ * // goals.length => 3
+ * // goals[1].completed => true
  */
 export function generateSampleGoals() {
   return [
@@ -128,8 +213,8 @@ export function generateSampleGoals() {
       targetReduction: 30,
       currentProgress: 18,
       unit: '%',
-      deadline: new Date(Date.now() + 90 * 86400000).toISOString(),
-      createdAt: new Date(Date.now() - 30 * 86400000).toISOString(),
+      deadline: new Date(Date.now() + 90 * MS_PER_DAY).toISOString(),
+      createdAt: new Date(Date.now() - 30 * MS_PER_DAY).toISOString(),
       completed: false,
     },
     {
@@ -139,8 +224,8 @@ export function generateSampleGoals() {
       targetReduction: 80,
       currentProgress: 80,
       unit: '%',
-      deadline: new Date(Date.now() + 30 * 86400000).toISOString(),
-      createdAt: new Date(Date.now() - 60 * 86400000).toISOString(),
+      deadline: new Date(Date.now() + 30 * MS_PER_DAY).toISOString(),
+      createdAt: new Date(Date.now() - 60 * MS_PER_DAY).toISOString(),
       completed: true,
     },
     {
@@ -150,15 +235,29 @@ export function generateSampleGoals() {
       targetReduction: 43,
       currentProgress: 28,
       unit: '%',
-      deadline: new Date(Date.now() + 60 * 86400000).toISOString(),
-      createdAt: new Date(Date.now() - 15 * 86400000).toISOString(),
+      deadline: new Date(Date.now() + 60 * MS_PER_DAY).toISOString(),
+      createdAt: new Date(Date.now() - 15 * MS_PER_DAY).toISOString(),
       completed: false,
     },
   ];
 }
 
 /**
- * Generate sample community data
+ * Generates sample community statistics and leaderboard data.
+ * Provides global metrics, a ranked leaderboard with the current user,
+ * and a set of planetary milestones with achievement status.
+ *
+ * @returns {Object} Community data snapshot.
+ * @returns {number} returns.totalCO2Reduced - Total kg CO₂ reduced by all users.
+ * @returns {number} returns.totalTrees - Equivalent trees planted.
+ * @returns {number} returns.totalUsers - Number of active users.
+ * @returns {number} returns.totalCountries - Number of countries represented.
+ * @returns {Array<Object>} returns.leaderboard - Ranked user entries.
+ * @returns {Array<Object>} returns.milestones - Community achievement milestones.
+ *
+ * @example
+ * const community = generateCommunityData();
+ * // community.leaderboard[9].name => 'You'
  */
 export function generateCommunityData() {
   return {
@@ -189,33 +288,46 @@ export function generateCommunityData() {
 }
 
 /**
- * Initialize sample data if none exists
+ * Initializes sample data in localStorage on first application launch.
+ * Seeds carbon data, history, goals, and challenge progress with realistic defaults.
+ * This function is idempotent — subsequent calls after initialization are no-ops.
+ *
+ * @returns {void}
+ *
+ * @example
+ * initializeSampleData(); // Seeds data on first call
+ * initializeSampleData(); // No-op on subsequent calls
  */
 export function initializeSampleData() {
   const SAMPLE_KEY = 'ecotrack_sample_initialized';
-  if (localStorage.getItem(SAMPLE_KEY)) return;
 
-  // Save sample carbon data
-  const carbonData = generateSampleCarbonData();
-  localStorage.setItem('ecotrack_carbon_data', JSON.stringify(carbonData));
+  try {
+    if (localStorage.getItem(SAMPLE_KEY)) return;
 
-  // Save sample history
-  const history = generateSampleHistory();
-  localStorage.setItem('ecotrack_history', JSON.stringify(history));
+    // Save sample carbon data
+    const carbonData = generateSampleCarbonData();
+    localStorage.setItem('ecotrack_carbon_data', JSON.stringify(carbonData));
 
-  // Save sample goals
-  const goals = generateSampleGoals();
-  localStorage.setItem('ecotrack_goals', JSON.stringify(goals));
+    // Save sample history
+    const history = generateSampleHistory();
+    localStorage.setItem('ecotrack_history', JSON.stringify(history));
 
-  // Save sample challenge progress
-  const challengeProgress = {
-    completed: ['d1', 'd2', 'd4', 'd5', 'd8', 'w1', 'w6', 'w8'],
-    currentStreak: 5,
-    longestStreak: 12,
-    lastCompletedDate: new Date().toISOString(),
-    totalPoints: 215,
-  };
-  localStorage.setItem('ecotrack_challenges', JSON.stringify(challengeProgress));
+    // Save sample goals
+    const goals = generateSampleGoals();
+    localStorage.setItem('ecotrack_goals', JSON.stringify(goals));
 
-  localStorage.setItem(SAMPLE_KEY, 'true');
+    // Save sample challenge progress
+    const challengeProgress = {
+      completed: ['d1', 'd2', 'd4', 'd5', 'd8', 'w1', 'w6', 'w8'],
+      currentStreak: 5,
+      longestStreak: 12,
+      lastCompletedDate: new Date().toISOString(),
+      totalPoints: 215,
+    };
+    localStorage.setItem('ecotrack_challenges', JSON.stringify(challengeProgress));
+
+    localStorage.setItem(SAMPLE_KEY, 'true');
+  } catch (e) {
+    console.warn('[SampleData] Failed to initialize sample data:', e.message || e);
+  }
 }

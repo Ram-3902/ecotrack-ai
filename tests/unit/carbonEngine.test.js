@@ -9,8 +9,6 @@ import {
   calculateCarbonScore,
   getScoreInfo,
   compareWithAverage,
-  EMISSION_FACTORS,
-  NATIONAL_AVERAGES,
 } from '../../src/utils/carbonEngine';
 
 describe('carbonEngine - calculateTransportation', () => {

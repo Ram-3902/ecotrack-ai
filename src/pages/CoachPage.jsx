@@ -1,13 +1,36 @@
 import { useState, useRef, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { getResponse, getGreeting } from '../utils/chatEngine';
 import { calculateTotal, calculateCarbonScore } from '../utils/carbonEngine';
-import { getTopInsights } from '../utils/insightsEngine';
+import { getTopInsights, calculatePotentialSavings } from '../utils/insightsEngine';
+import {
+  sanitizeTextInput,
+  validateNumericInput,
+  validateSelectInput,
+  createRateLimiter,
+} from '../utils/inputSecurity';
 
-export default function CoachPage({ carbonData, onUpdateCarbonData }) {
-  const [messages, setMessages] = useState([]);
+/** @type {string[]} Allowed vehicle type values for whitelist validation. */
+const ALLOWED_CAR_TYPES = ['none', 'gasoline', 'diesel', 'hybrid', 'electric'];
+
+/** @type {string[]} Allowed diet type values for whitelist validation. */
+const ALLOWED_DIET_TYPES = ['heavy_meat', 'mixed', 'pescatarian', 'vegetarian', 'vegan'];
+
+/** @type {string[]} Allowed heating type values for whitelist validation. */
+const ALLOWED_HEATING_TYPES = ['electric', 'natural_gas'];
+
+/** Chat message rate limiter: max 10 messages per 30 seconds. */
+const chatRateLimiter = createRateLimiter(10, 30000);
+
+export default function CoachPage({ onUpdateCarbonData }) {
+  const [messages, setMessages] = useState(() => {
+    const greeting = getGreeting();
+    return [{ id: 'g1', role: 'ai', text: greeting.text, followUps: greeting.followUps }];
+  });
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
+  const messageIdCounter = useRef(1);
 
   // Coach interview wizard state
   const [isCoaching, setIsCoaching] = useState(false);
@@ -21,11 +44,6 @@ export default function CoachPage({ carbonData, onUpdateCarbonData }) {
 
   const [coachResults, setCoachResults] = useState(null);
 
-  useEffect(() => {
-    const greeting = getGreeting();
-    setMessages([{ id: 'g1', role: 'ai', text: greeting.text, followUps: greeting.followUps }]);
-  }, []);
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -34,11 +52,20 @@ export default function CoachPage({ carbonData, onUpdateCarbonData }) {
     scrollToBottom();
   }, [messages, isTyping]);
 
+  /**
+   * Sends a chat message after sanitizing and rate-limiting.
+   * @param {string} [textToSend] - Optional text override (e.g., from follow-up chip).
+   */
   const handleSendMessage = (textToSend) => {
-    const query = textToSend || inputText;
+    const rawQuery = textToSend || inputText;
+    const query = sanitizeTextInput(rawQuery, 500);
     if (!query.trim()) return;
 
-    const userMsg = { id: Date.now().toString(), role: 'user', text: query };
+    // Rate limit check
+    if (!chatRateLimiter()) return;
+
+    messageIdCounter.current += 1;
+    const userMsg = { id: `msg-${messageIdCounter.current}`, role: 'user', text: query };
     setMessages(prev => [...prev, userMsg]);
     setInputText('');
     setIsTyping(true);
@@ -46,8 +73,9 @@ export default function CoachPage({ carbonData, onUpdateCarbonData }) {
     setTimeout(() => {
       const response = getResponse(query);
       setIsTyping(false);
+      messageIdCounter.current += 1;
       setMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
+        id: `msg-${messageIdCounter.current}`,
         role: 'ai',
         text: response.text,
         followUps: response.followUps
@@ -61,10 +89,47 @@ export default function CoachPage({ carbonData, onUpdateCarbonData }) {
     setCoachStep(1);
   };
 
+  /**
+   * Validates and updates a coach assessment form value.
+   * Applies whitelist validation for selects and numeric clamping for sliders.
+   * @param {string} category - The form category ('transportation', 'food', etc.).
+   * @param {string} field - The specific field name.
+   * @param {*} value - The raw input value.
+   */
   const handleCoachValueChange = (category, field, value) => {
+    let validatedValue = value;
+
+    // Validate select inputs
+    if (field === 'carType') {
+      validatedValue = validateSelectInput(value, ALLOWED_CAR_TYPES, 'gasoline');
+    } else if (field === 'dietType') {
+      validatedValue = validateSelectInput(value, ALLOWED_DIET_TYPES, 'mixed');
+    } else if (field === 'heatingType') {
+      validatedValue = validateSelectInput(value, ALLOWED_HEATING_TYPES, 'electric');
+    } else if (typeof value === 'number' || !isNaN(Number(value))) {
+      // Validate numeric inputs with appropriate ranges
+      const numRanges = {
+        carKmPerWeek: [0, 500, 80],
+        busKmPerWeek: [0, 200, 20],
+        trainKmPerWeek: [0, 200, 10],
+        flightsPerYear: [0, 10, 2],
+        electricityKwhPerMonth: [100, 1200, 350],
+        renewablePercent: [0, 100, 15],
+        foodWastePercent: [0, 50, 15],
+        clothingItemsPerMonth: [0, 12, 2],
+        monthlySpending: [0, 1200, 200],
+      };
+      const range = numRanges[field];
+      if (range) {
+        validatedValue = validateNumericInput(value, range[0], range[1], range[2]);
+      } else {
+        validatedValue = validateNumericInput(value, 0, 10000, 0);
+      }
+    }
+
     setCoachAnswers(prev => ({
       ...prev,
-      [category]: { ...prev[category], [field]: value }
+      [category]: { ...prev[category], [field]: validatedValue }
     }));
   };
 
@@ -92,6 +157,12 @@ export default function CoachPage({ carbonData, onUpdateCarbonData }) {
       };
 
       const recs = getTopInsights(calculated.breakdown, 3);
+      const potentialSavings = calculatePotentialSavings(recs);
+
+      // Calculate reduction percentage against global average
+      const reductionFromRecs = potentialSavings.co2Kg;
+      const reductionPercent = Math.round((reductionFromRecs / (calculated.monthlyTotal * 12)) * 100);
+
 
       const actionPlans = {
         transportation: [
@@ -141,6 +212,8 @@ export default function CoachPage({ carbonData, onUpdateCarbonData }) {
         yearlyTons: calculated.yearlyTons,
         biggestSource: labels[biggestSourceKey] || biggestSourceKey,
         recommendations: recs,
+        potentialSavings,
+        reductionPercent,
         weeklyPlan: plan,
         formData: coachAnswers
       });
@@ -525,6 +598,14 @@ Your carbon score of **${coachResults.score}/100** has been synced. The dashboar
                       </div>
                     </div>
 
+                    {/* Reduction Guidance Summary */}
+                    <div className="saas-card" style={{ padding: '16px', background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.2)' }}>
+                      <div style={{ fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', color: 'var(--color-primary)', marginBottom: '8px' }}>Personalized Reduction Guidance</div>
+                      <p style={{ fontSize: '13px', lineHeight: 1.6, color: 'var(--text-primary)', margin: 0 }}>
+                        By implementing these {coachResults.recommendations.length} recommendations, you could reduce your footprint by <strong>{coachResults.potentialSavings.co2Kg.toLocaleString()} kg CO₂/year</strong> ({coachResults.reductionPercent}% of your current output), saving approximately <strong>${coachResults.potentialSavings.costSavings.toLocaleString()}/year</strong>. This would move your planetary health score from <strong>{coachResults.score}</strong> significantly higher.
+                      </p>
+                    </div>
+
                     <div>
                       <div style={{ fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: '8px' }}>7-Day Action Calendar</div>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px' }}>
@@ -537,6 +618,19 @@ Your carbon score of **${coachResults.score}/100** has been synced. The dashboar
                       </div>
                       <div style={{ fontSize: '12px', color: 'var(--text-secondary)', background: 'rgba(16,185,129,0.05)', padding: '12px', borderRadius: 'var(--radius-md)', border: '1px solid rgba(16,185,129,0.15)', marginTop: '12px' }}>
                         <strong>Today's Prescribed Habit:</strong> {coachResults.weeklyPlan[0].title} — {coachResults.weeklyPlan[0].task}
+                      </div>
+
+                      {/* Expanded 7-Day Action Plan Details */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
+                        {coachResults.weeklyPlan.map(day => (
+                          <div key={day.day} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', padding: '8px 12px', borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--color-border)' }}>
+                            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-primary)', minWidth: '30px' }}>{day.day}</span>
+                            <div>
+                              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>{day.title}</div>
+                              <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px' }}>{day.task}</div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
 
@@ -612,6 +706,7 @@ Your carbon score of **${coachResults.score}/100** has been synced. The dashboar
                 className="saas-input"
                 aria-label="Chat query input"
                 placeholder="Ask about electricity tariffs, diets, flight offsets..."
+                maxLength={500}
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
               />
@@ -625,3 +720,8 @@ Your carbon score of **${coachResults.score}/100** has been synced. The dashboar
     </div>
   );
 }
+
+CoachPage.propTypes = {
+  onUpdateCarbonData: PropTypes.func.isRequired,
+};
+

@@ -1,31 +1,36 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
 import { jsPDF } from 'jspdf';
 import { getGoals, saveGoal, updateGoal } from '../utils/dataStore';
 import { getTopInsights } from '../utils/insightsEngine';
 import { generateSampleHistory } from '../utils/sampleData';
+import { sanitizeTextInput, validateNumericInput, validateSelectInput } from '../utils/inputSecurity';
 import ScoreGauge from '../components/ScoreGauge';
+import { CarbonDataShape } from '../utils/propTypes';
+
+/** @type {string[]} Allowed goal categories for whitelist validation. */
+const ALLOWED_GOAL_CATEGORIES = ['transportation', 'energy', 'food', 'shopping'];
 
 export default function DashboardPage({ carbonData }) {
-  const [goals, setGoals] = useState([]);
+  const [goals, setGoals] = useState(() => getGoals());
   const [newGoalTitle, setNewGoalTitle] = useState('');
   const [newGoalCategory, setNewGoalCategory] = useState('transportation');
   const [newGoalTarget, setNewGoalTarget] = useState(20);
   const [showAddGoal, setShowAddGoal] = useState(false);
 
-  // Load goals
-  useEffect(() => {
-    setGoals(getGoals());
-  }, []);
-
+  /**
+   * Handles new goal form submission with input validation and sanitization.
+   * @param {Event} e - Form submit event.
+   */
   const handleAddGoal = (e) => {
     e.preventDefault();
-    if (!newGoalTitle.trim()) return;
+    const sanitizedTitle = sanitizeTextInput(newGoalTitle, 100);
+    if (!sanitizedTitle) return;
 
     const newGoal = {
-      title: newGoalTitle,
-      category: newGoalCategory,
-      targetReduction: newGoalTarget,
+      title: sanitizedTitle,
+      category: validateSelectInput(newGoalCategory, ALLOWED_GOAL_CATEGORIES, 'transportation'),
+      targetReduction: validateNumericInput(newGoalTarget, 1, 100, 20),
       currentProgress: 0,
       unit: '%',
       deadline: new Date(Date.now() + 60 * 86400000).toISOString(),
@@ -39,8 +44,9 @@ export default function DashboardPage({ carbonData }) {
 
   const handleToggleGoal = (id, currentStatus) => {
     const updated = updateGoal(id, { completed: !currentStatus });
-    setGoals(getGoals());
+    setGoals(updated);
   };
+
 
   // Generate PDF report
   const downloadPDFReport = () => {
@@ -250,6 +256,7 @@ export default function DashboardPage({ carbonData }) {
                   type="text"
                   placeholder="e.g. Turn off standby power"
                   className="saas-input"
+                  maxLength={100}
                   value={newGoalTitle}
                   onChange={(e) => setNewGoalTitle(e.target.value)}
                 />
@@ -278,7 +285,7 @@ export default function DashboardPage({ carbonData }) {
                     max="100"
                     className="saas-input"
                     value={newGoalTarget}
-                    onChange={(e) => setNewGoalTarget(parseInt(e.target.value))}
+                    onChange={(e) => setNewGoalTarget(validateNumericInput(e.target.value, 1, 100, 20))}
                   />
                 </div>
               </div>
@@ -365,3 +372,8 @@ export default function DashboardPage({ carbonData }) {
     </div>
   );
 }
+
+DashboardPage.propTypes = {
+  carbonData: CarbonDataShape,
+};
+
