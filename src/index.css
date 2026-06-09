@@ -18,7 +18,7 @@
   
   --text-primary: #f9fafb;          /* Bright white-gray */
   --text-secondary: #9ca3af;        /* Slate gray */
-  --text-muted: #6b7280;            /* Darker slate gray */
+  --text-muted: #808896;            /* Darker slate gray (brightened for accessibility contrast) */
   
   /* Fonts */
   --font-sans: 'Inter', -apple-system, sans-serif;
@@ -186,7 +186,7 @@ p {
 .saas-btn--primary {
   background: var(--color-primary);
   border-color: var(--color-primary);
-  color: #ffffff;
+  color: #0f172a;
 }
 
 .saas-btn--primary:hover {
@@ -198,7 +198,7 @@ p {
 .saas-btn--secondary {
   background: var(--color-secondary);
   border-color: var(--color-secondary);
-  color: #ffffff;
+  color: #0f172a;
 }
 
 .saas-btn--secondary:hover {
@@ -352,4 +352,22 @@ p {
 @keyframes saasPulse {
   0%, 100% { opacity: 0.5; }
   50% { opacity: 1; }
+}
+
+/* Accessibility Focus Ring and Utility Styles */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

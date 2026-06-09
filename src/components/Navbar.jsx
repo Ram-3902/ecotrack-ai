@@ -31,7 +31,7 @@ export default function Navbar() {
           gap: '8px',
           textDecoration: 'none',
         }}>
-          <span style={{ fontSize: '20px' }}>🌿</span>
+          <span style={{ fontSize: '20px' }} aria-hidden="true">🌿</span>
           <span style={{
             fontSize: '18px',
             fontWeight: 700,
@@ -43,7 +43,7 @@ export default function Navbar() {
         </NavLink>
 
         {/* Navigation Links */}
-        <nav style={{
+        <nav aria-label="Main Navigation" style={{
           display: 'flex',
           alignItems: 'center',
           gap: '24px',

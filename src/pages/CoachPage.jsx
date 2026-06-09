@@ -251,12 +251,13 @@ Your carbon score of **${coachResults.score}/100** has been synced. The dashboar
                 
                 {coachStep === 1 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '520px', margin: '0 auto', width: '100%' }}>
-                    <h3>🚗 Transportation Profile</h3>
+                    <h3><span aria-hidden="true">🚗</span> Transportation Profile</h3>
                     <p>Enter your commute habits below to let the Coach compute your transit emissions.</p>
                     
                     <div>
-                      <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>Vehicle Class</label>
+                      <label htmlFor="coach-vehicle-class" style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', cursor: 'pointer' }}>Vehicle Class</label>
                       <select
+                        id="coach-vehicle-class"
                         className="saas-select"
                         value={coachAnswers.transportation.carType}
                         onChange={(e) => handleCoachValueChange('transportation', 'carType', e.target.value)}
@@ -272,10 +273,11 @@ Your carbon score of **${coachResults.score}/100** has been synced. The dashboar
                     {coachAnswers.transportation.carType !== 'none' && (
                       <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '13px' }}>
-                          <span>Car Commutes (km/week):</span>
+                          <label htmlFor="coach-car-commutes" style={{ color: 'var(--text-secondary)', cursor: 'pointer' }}>Car Commutes (km/week):</label>
                           <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>{coachAnswers.transportation.carKmPerWeek} km</span>
                         </div>
                         <input
+                          id="coach-car-commutes"
                           type="range"
                           min="0"
                           max="500"
@@ -289,10 +291,11 @@ Your carbon score of **${coachResults.score}/100** has been synced. The dashboar
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                       <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '13px' }}>
-                          <span>Transit (km/wk):</span>
+                          <label htmlFor="coach-transit" style={{ color: 'var(--text-secondary)', cursor: 'pointer' }}>Transit (km/wk):</label>
                           <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>{coachAnswers.transportation.busKmPerWeek} km</span>
                         </div>
                         <input
+                          id="coach-transit"
                           type="range"
                           min="0"
                           max="200"
@@ -303,10 +306,11 @@ Your carbon score of **${coachResults.score}/100** has been synced. The dashboar
                       </div>
                       <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '13px' }}>
-                          <span>Flights (/yr):</span>
+                          <label htmlFor="coach-flights" style={{ color: 'var(--text-secondary)', cursor: 'pointer' }}>Flights (/yr):</label>
                           <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>{coachAnswers.transportation.flightsPerYear}</span>
                         </div>
                         <input
+                          id="coach-flights"
                           type="range"
                           min="0"
                           max="10"
@@ -325,12 +329,13 @@ Your carbon score of **${coachResults.score}/100** has been synced. The dashboar
 
                 {coachStep === 2 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '520px', margin: '0 auto', width: '100%' }}>
-                    <h3>🥦 Food & Waste Assessment</h3>
+                    <h3><span aria-hidden="true">🥦</span> Food & Waste Assessment</h3>
                     <p>Select your diet type and specify the average grocery discard rate.</p>
 
                     <div>
-                      <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>Primary Diet</label>
+                      <label htmlFor="coach-food-diet" style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', cursor: 'pointer' }}>Primary Diet</label>
                       <select
+                        id="coach-food-diet"
                         className="saas-select"
                         value={coachAnswers.food.dietType}
                         onChange={(e) => handleCoachValueChange('food', 'dietType', e.target.value)}
@@ -345,10 +350,11 @@ Your carbon score of **${coachResults.score}/100** has been synced. The dashboar
 
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '13px' }}>
-                        <span>Wasted Grocery Portions:</span>
+                        <label htmlFor="coach-food-waste" style={{ color: 'var(--text-secondary)', cursor: 'pointer' }}>Wasted Grocery Portions:</label>
                         <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>{coachAnswers.food.foodWastePercent}%</span>
                       </div>
                       <input
+                        id="coach-food-waste"
                         type="range"
                         min="0"
                         max="50"
@@ -367,15 +373,16 @@ Your carbon score of **${coachResults.score}/100** has been synced. The dashboar
 
                 {coachStep === 3 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '520px', margin: '0 auto', width: '100%' }}>
-                    <h3>⚡ Household Energy Profile</h3>
+                    <h3><span aria-hidden="true">⚡</span> Household Energy Profile</h3>
                     <p>Enter your electricity consumption metrics.</p>
 
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '13px' }}>
-                        <span>Monthly Electricity:</span>
+                        <label htmlFor="coach-energy-electricity" style={{ color: 'var(--text-secondary)', cursor: 'pointer' }}>Monthly Electricity:</label>
                         <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>{coachAnswers.energy.electricityKwhPerMonth} kWh</span>
                       </div>
                       <input
+                        id="coach-energy-electricity"
                         type="range"
                         min="100"
                         max="1200"
@@ -388,10 +395,11 @@ Your carbon score of **${coachResults.score}/100** has been synced. The dashboar
 
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '13px' }}>
-                        <span>Renewable Electricity Share:</span>
+                        <label htmlFor="coach-energy-renewable" style={{ color: 'var(--text-secondary)', cursor: 'pointer' }}>Renewable Electricity Share:</label>
                         <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>{coachAnswers.energy.renewablePercent}%</span>
                       </div>
                       <input
+                        id="coach-energy-renewable"
                         type="range"
                         min="0"
                         max="100"
@@ -403,8 +411,9 @@ Your carbon score of **${coachResults.score}/100** has been synced. The dashboar
                     </div>
 
                     <div>
-                      <label style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>Heating Fuel</label>
+                      <label htmlFor="coach-energy-heating" style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px', cursor: 'pointer' }}>Heating Fuel</label>
                       <select
+                        id="coach-energy-heating"
                         className="saas-select"
                         value={coachAnswers.energy.heatingType}
                         onChange={(e) => handleCoachValueChange('energy', 'heatingType', e.target.value)}
@@ -423,15 +432,16 @@ Your carbon score of **${coachResults.score}/100** has been synced. The dashboar
 
                 {coachStep === 4 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '520px', margin: '0 auto', width: '100%' }}>
-                    <h3>🛍️ Consumer Shopping Profile</h3>
+                    <h3><span aria-hidden="true">🛍️</span> Consumer Shopping Profile</h3>
                     <p>Enter your clothes shopping rates and goods spending.</p>
 
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '13px' }}>
-                        <span>New Apparel Bought (items/month):</span>
+                        <label htmlFor="coach-shopping-apparel" style={{ color: 'var(--text-secondary)', cursor: 'pointer' }}>New Apparel Bought (items/month):</label>
                         <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>{coachAnswers.shopping.clothingItemsPerMonth} items</span>
                       </div>
                       <input
+                        id="coach-shopping-apparel"
                         type="range"
                         min="0"
                         max="12"
@@ -443,10 +453,11 @@ Your carbon score of **${coachResults.score}/100** has been synced. The dashboar
 
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '13px' }}>
-                        <span>Monthly Goods Spending ($):</span>
+                        <label htmlFor="coach-shopping-spending" style={{ color: 'var(--text-secondary)', cursor: 'pointer' }}>Monthly Goods Spending ($):</label>
                         <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>${coachAnswers.shopping.monthlySpending}</span>
                       </div>
                       <input
+                        id="coach-shopping-spending"
                         type="range"
                         min="0"
                         max="1200"
@@ -583,25 +594,31 @@ Your carbon score of **${coachResults.score}/100** has been synced. The dashboar
 
           {/* Standard Input Form */}
           {!isCoaching && (
-            <div style={{
-              padding: '16px 24px',
-              borderTop: '1px solid var(--color-border)',
-              display: 'flex',
-              gap: '12px',
-              background: 'rgba(255,255,255,0.01)',
-            }}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSendMessage();
+              }}
+              style={{
+                padding: '16px 24px',
+                borderTop: '1px solid var(--color-border)',
+                display: 'flex',
+                gap: '12px',
+                background: 'rgba(255,255,255,0.01)',
+              }}
+            >
               <input
                 type="text"
                 className="saas-input"
+                aria-label="Chat query input"
                 placeholder="Ask about electricity tariffs, diets, flight offsets..."
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
               />
-              <button className="saas-btn saas-btn--primary" onClick={() => handleSendMessage()}>
+              <button type="submit" className="saas-btn saas-btn--primary">
                 Send
               </button>
-            </div>
+            </form>
           )}
         </div>
       </div>

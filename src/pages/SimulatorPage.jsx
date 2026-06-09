@@ -119,16 +119,25 @@ export default function SimulatorPage({ carbonData }) {
           <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>Lifestyle Adjustments</h3>
 
           {[
-            { key: 'solar', label: '☀️ Transition to Green Energy / Solar', desc: 'Offsets 80-100% of grid electricity emissions by utilizing solar panels or a renewable provider tariff.' },
-            { key: 'vegan', label: '🌱 Switch to Plant-Based Diet', desc: 'Cutting out meat and dairy reduces food production emissions by up to 60-70%.' },
-            { key: 'ev', label: '⚡ Commute with Electric Vehicle / Transit', desc: 'Replaces standard internal combustion driving with EV charging or public rail/bus commutes.' },
-            { key: 'zeroWaste', label: '🗑️ Eliminate Food Waste', desc: 'Avoids throwing out expired groceries, stopping methane release in landfills.' },
-            { key: 'thrift', label: '👗 Buy Second-Hand Clothes', desc: 'Reduces clothing item purchases by 50% through thrifting and clothes exchanges.' },
-            { key: 'shortShowers', label: '🚿 Limit Showers to 5 Minutes', desc: 'Saves water volume and minimizes natural gas/electric water heating energy.' },
+            { key: 'solar', emoji: '☀️', label: 'Transition to Green Energy / Solar', desc: 'Offsets 80-100% of grid electricity emissions by utilizing solar panels or a renewable provider tariff.' },
+            { key: 'vegan', emoji: '🌱', label: 'Switch to Plant-Based Diet', desc: 'Cutting out meat and dairy reduces food production emissions by up to 60-70%.' },
+            { key: 'ev', emoji: '⚡', label: 'Commute with Electric Vehicle / Transit', desc: 'Replaces standard internal combustion driving with EV charging or public rail/bus commutes.' },
+            { key: 'zeroWaste', emoji: '🗑️', label: 'Eliminate Food Waste', desc: 'Avoids throwing out expired groceries, stopping methane release in landfills.' },
+            { key: 'thrift', emoji: '👗', label: 'Buy Second-Hand Clothes', desc: 'Reduces clothing item purchases by 50% through thrifting and clothes exchanges.' },
+            { key: 'shortShowers', emoji: '🚿', label: 'Limit Showers to 5 Minutes', desc: 'Saves water volume and minimizes natural gas/electric water heating energy.' },
           ].map(opt => (
             <div
               key={opt.key}
+              role="checkbox"
+              aria-checked={simChoices[opt.key]}
+              tabIndex={0}
               onClick={() => handleToggle(opt.key)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleToggle(opt.key);
+                }
+              }}
               className="saas-card"
               style={{
                 cursor: 'pointer',
@@ -142,7 +151,10 @@ export default function SimulatorPage({ carbonData }) {
               }}
             >
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>{opt.label}</div>
+                <div style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span aria-hidden="true">{opt.emoji}</span>
+                  <span>{opt.label}</span>
+                </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px', lineHeight: 1.4 }}>{opt.desc}</div>
               </div>
               <div style={{

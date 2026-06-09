@@ -16,15 +16,19 @@ export default function ScoreGauge({ score = 60, size = 120 }) {
   const color = getColor(score);
 
   return (
-    <div style={{
-      position: 'relative',
-      width: `${size}px`,
-      height: `${size}px`,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }}>
-      <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
+    <div
+      role="img"
+      aria-label={`Planetary Health Score: ${score} out of 100`}
+      style={{
+        position: 'relative',
+        width: `${size}px`,
+        height: `${size}px`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <svg aria-hidden="true" width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
         {/* Track circle */}
         <circle
           cx={size / 2}
@@ -50,13 +54,16 @@ export default function ScoreGauge({ score = 60, size = 120 }) {
       </svg>
       
       {/* Score Label inside center */}
-      <div style={{
-        position: 'absolute',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
         <span style={{
           fontSize: `${size * 0.22}px`,
           fontWeight: 800,

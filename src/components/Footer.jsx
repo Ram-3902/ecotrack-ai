@@ -18,7 +18,7 @@ export default function Footer() {
           {/* Logo & Slogan */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '20px' }}>🌿</span>
+              <span style={{ fontSize: '20px' }} aria-hidden="true">🌿</span>
               <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>EcoTrack AI</span>
             </div>
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)', maxWidth: '240px' }}>

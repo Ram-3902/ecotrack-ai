@@ -184,7 +184,7 @@ export default function DashboardPage({ carbonData }) {
         gap: '24px',
       }}>
         {/* Trend Area Chart */}
-        <div className="saas-card" style={{ display: 'flex', flexDirection: 'column', height: '320px' }}>
+        <div role="region" aria-label="Historical Carbon Footprint Trend Chart" className="saas-card" style={{ display: 'flex', flexDirection: 'column', height: '320px' }}>
           <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '16px', color: 'var(--text-primary)' }}>Historical Footprint Trend</div>
           <div style={{ flex: 1 }}>
             <ResponsiveContainer width="100%" height="100%">
@@ -206,7 +206,7 @@ export default function DashboardPage({ carbonData }) {
         </div>
 
         {/* Category Breakdown Bar Chart */}
-        <div className="saas-card" style={{ display: 'flex', flexDirection: 'column', height: '320px' }}>
+        <div role="region" aria-label="Emissions Category Breakdown Chart" className="saas-card" style={{ display: 'flex', flexDirection: 'column', height: '320px' }}>
           <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '16px', color: 'var(--text-primary)' }}>Emissions by Category</div>
           <div style={{ flex: 1 }}>
             <ResponsiveContainer width="100%" height="100%">
@@ -244,8 +244,9 @@ export default function DashboardPage({ carbonData }) {
           {showAddGoal && (
             <form onSubmit={handleAddGoal} className="saas-card" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(255,255,255,0.02)' }}>
               <div>
-                <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Target Title</label>
+                <label htmlFor="dashboard-goal-title" style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', cursor: 'pointer' }}>Target Title</label>
                 <input
+                  id="dashboard-goal-title"
                   type="text"
                   placeholder="e.g. Turn off standby power"
                   className="saas-input"
@@ -255,8 +256,9 @@ export default function DashboardPage({ carbonData }) {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 <div>
-                  <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Category</label>
+                  <label htmlFor="dashboard-goal-category" style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', cursor: 'pointer' }}>Category</label>
                   <select
+                    id="dashboard-goal-category"
                     className="saas-select"
                     value={newGoalCategory}
                     onChange={(e) => setNewGoalCategory(e.target.value)}
@@ -268,8 +270,9 @@ export default function DashboardPage({ carbonData }) {
                   </select>
                 </div>
                 <div>
-                  <label style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Reduction Target (%)</label>
+                  <label htmlFor="dashboard-goal-target" style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px', cursor: 'pointer' }}>Reduction Target (%)</label>
                   <input
+                    id="dashboard-goal-target"
                     type="number"
                     min="1"
                     max="100"
@@ -303,6 +306,7 @@ export default function DashboardPage({ carbonData }) {
               >
                 <input
                   type="checkbox"
+                  aria-label={`Mark target "${g.title}" as ${g.completed ? 'uncompleted' : 'completed'}`}
                   checked={g.completed || false}
                   onChange={() => handleToggleGoal(g.id, g.completed)}
                   style={{
@@ -341,7 +345,7 @@ export default function DashboardPage({ carbonData }) {
                   border: '1px solid var(--color-border)',
                 }}
               >
-                <span style={{ fontSize: '24px' }}>{rec.icon}</span>
+                <span style={{ fontSize: '24px' }} aria-hidden="true">{rec.icon}</span>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 600, fontSize: '14px' }}>{rec.title}</div>
                   <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px', lineHeight: 1.5 }}>

@@ -70,10 +70,13 @@ export default function ChallengesPage({ challengeProgress, onUpdateChallenges }
         {/* Left Column: Challenges List */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Tabs */}
-          <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--color-border)', paddingBottom: '8px' }}>
+          <div role="tablist" style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--color-border)', paddingBottom: '8px' }}>
             {['daily', 'weekly', 'monthly'].map(tab => (
               <button
                 key={tab}
+                role="tab"
+                aria-selected={activeTab === tab}
+                aria-controls={`${tab}-panel`}
                 onClick={() => setActiveTab(tab)}
                 style={{
                   background: 'none',
@@ -95,7 +98,11 @@ export default function ChallengesPage({ challengeProgress, onUpdateChallenges }
           </div>
 
           {/* List */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', maxHeight: '420px', paddingRight: '4px' }}>
+          <div
+            role="tabpanel"
+            id={`${activeTab}-panel`}
+            style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', maxHeight: '420px', paddingRight: '4px' }}
+          >
             {activeChallenges.map(c => {
               const isCompleted = challengeProgress?.completed?.includes(c.id);
               return (
@@ -111,14 +118,15 @@ export default function ChallengesPage({ challengeProgress, onUpdateChallenges }
                     opacity: isCompleted ? 0.6 : 1,
                   }}
                 >
-                  <span style={{ fontSize: '24px' }}>{c.icon}</span>
+                  <span style={{ fontSize: '24px' }} aria-hidden="true">{c.icon}</span>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>{c.title}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>{c.description}</div>
+                    <div id={`challenge-title-${c.id}`} style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>{c.title}</div>
+                    <div id={`challenge-desc-${c.id}`} style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>{c.description}</div>
                   </div>
                   <button
                     onClick={() => handleComplete(c.id, c.points)}
                     disabled={isCompleted}
+                    aria-describedby={`challenge-title-${c.id} challenge-desc-${c.id}`}
                     className={`saas-btn saas-btn--sm ${isCompleted ? '' : 'saas-btn--primary'}`}
                   >
                     {isCompleted ? '✓ Completed' : `+${c.points} XP`}
@@ -144,6 +152,8 @@ export default function ChallengesPage({ challengeProgress, onUpdateChallenges }
             {badges.map(b => (
               <div
                 key={b.id}
+                role="img"
+                aria-label={`${b.name} badge - ${b.tier} tier. ${b.description} (${b.earned ? 'Unlocked' : 'Locked'})`}
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
@@ -157,11 +167,11 @@ export default function ChallengesPage({ challengeProgress, onUpdateChallenges }
                 }}
                 title={`${b.name}: ${b.description}`}
               >
-                <span style={{ fontSize: '28px' }}>{b.icon}</span>
-                <span style={{ fontSize: '12px', fontWeight: 600, marginTop: '8px', color: 'var(--text-primary)', display: 'block', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <span style={{ fontSize: '28px' }} aria-hidden="true">{b.icon}</span>
+                <span aria-hidden="true" style={{ fontSize: '12px', fontWeight: 600, marginTop: '8px', color: 'var(--text-primary)', display: 'block', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {b.name}
                 </span>
-                <span style={{ fontSize: '9px', textTransform: 'uppercase', color: b.tierColor, fontWeight: 700, marginTop: '2px' }}>
+                <span aria-hidden="true" style={{ fontSize: '9px', textTransform: 'uppercase', color: b.tierColor, fontWeight: 700, marginTop: '2px' }}>
                   {b.tier}
                 </span>
               </div>

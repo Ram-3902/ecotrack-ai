@@ -34,7 +34,7 @@ export default function MiniSimulator() {
       background: 'rgba(17, 24, 39, 0.8)',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-        <span style={{ fontSize: '18px' }}>⚡</span>
+        <span style={{ fontSize: '18px' }} aria-hidden="true">⚡</span>
         <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Interactive Preview</span>
       </div>
 
@@ -43,10 +43,11 @@ export default function MiniSimulator() {
       {/* Slider */}
       <div style={{ marginBottom: '20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px' }}>
-          <span style={{ color: 'var(--text-secondary)' }}>Weekly driving distance:</span>
+          <label htmlFor="mini-driving-slider" style={{ color: 'var(--text-secondary)', cursor: 'pointer' }}>Weekly driving distance:</label>
           <span style={{ fontWeight: 600, color: 'var(--color-primary)', fontFamily: 'var(--font-mono)' }}>{kmDriven} km</span>
         </div>
         <input
+          id="mini-driving-slider"
           type="range"
           min="0"
           max="400"
@@ -59,8 +60,9 @@ export default function MiniSimulator() {
 
       {/* Select */}
       <div style={{ marginBottom: '24px' }}>
-        <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '8px' }}>Primary Diet Type:</label>
+        <label htmlFor="mini-diet-select" style={{ display: 'block', fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '8px', cursor: 'pointer' }}>Primary Diet Type:</label>
         <select
+          id="mini-diet-select"
           className="saas-select"
           value={diet}
           onChange={(e) => setDiet(e.target.value)}
